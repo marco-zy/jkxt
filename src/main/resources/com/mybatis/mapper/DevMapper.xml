@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.DevMapper">
+
+<select id="count" resultType="int">
+
+    select count(*) from device
+    <where>
+
+        <if test="status!=null and status!=''">
+            status like concat('%',#{status},'%')
+        </if>
+        <if test="projectNo!=null and projectNo!=''">
+            and project_no like concat('%',#{projectNo},'%')
+        </if>
+
+    </where>
+
+</select>
+
+<select id="devselect" resultType="com.mybatis.pojo.Dev">
+
+    select * from device
+    <where>
+
+        <if test="status!=null and status!=''">
+            status like concat('%',#{status},'%')
+        </if>
+        <if test="projectNo!=null and projectNo!=''">
+            and project_no like concat('%',#{projectNo},'%')
+        </if>
+
+    </where>
+
+    limit #{index},#{pagesize}
+
+
+</select>
+
+    <select id="selectprojectNo" resultType="String">
+        select distinct project_no from device
+
+    </select>
+
+<update id="devupdate">
+    update device
+    <trim prefix="set" suffixOverrides=",">
+
+        <if test="deviceName!=null and deviceName!=''">
+            device_name=#{deviceName},
+            update_time=now(),
+        </if>
+
+        <if test="deviceNo!=null and deviceNo!=''">
+            device_no=#{deviceNo},
+            update_time=now(),
+        </if>
+
+        <if test="storage!=null and storage!=''">
+            storage=#{storage},
+            update_time=now(),
+        </if>
+
+        <if test="status!=null and status!=''">
+            status=#{status},
+            update_time=now(),
+        </if>
+
+        <if test="projectNo!=null">
+
+            project_no=#{projectNo},
+            update_time=now(),
+        </if>
+    </trim>
+    where id=#{id}
+
+</update>
+
+<insert id="devinsert">
+
+    insert into device(project_no,device_name,channel,device_no,storage,create_time,update_time,status)
+    values
+    (#{projectNo},#{deviceName},#{channel},#{deviceNo},#{storage},now(),now(),#{status})
+
+
+</insert>
+
+<delete id="devdelete">
+
+    delete from device where id in
+    <foreach collection="ids" item="id" separator="," open="(" close=")">
+        #{id}
+    </foreach>
+
+
+</delete>
+
+    <select id="dashdevcount" resultType="int">
+
+    select count(*) from device
+    </select>
+
+
+    <select id="selectnotbound" resultType="com.mybatis.pojo.Dev">
+        select * from device
+            where status=#{status}
+    </select>
+
+    <update id="devbound">
+
+    update device
+
+    set status=#{status}
+
+    , project_no=#{projectNo}
+
+    where id=#{id}
+
+</update>
+
+
+
+
+
+</mapper>

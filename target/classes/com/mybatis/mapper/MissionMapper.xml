@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.MissionMapper">
+
+    <select id="selectAll1" resultType="com.mybatis.pojo.Mission">
+        select * from mission
+    </select>
+
+    <select id="select" resultType="com.mybatis.pojo.Mission">
+        select * from mission
+        <where>
+            <if test="executorName !=NULL">
+                executor like concat('%',#{executorName},'%')
+            </if>
+            <if test="department !=NULL">
+                and creat_department=#{department}
+            </if>
+        </where>
+    </select>
+
+
+    <!--分页查询-->
+<!--
+    <select id="MissionSelect" resultType="Mission">
+        select * from mission
+        limit #{index},#{pagesize}
+    </select>
+-->
+
+
+    <select id="MissionSelect" resultType="com.mybatis.pojo.Mission">/*单条记录的返回类型*/
+        select * from mission
+        <where>
+            <if test='executorName!=null and executorName !=""'>
+                executor like concat('%',#{executorName},'%')
+            </if>
+
+            <if test="status !=null and status !=''">
+                and status=#{status}
+            </if>
+
+            <if test="createDepartment!=null and createDepartment !=''">
+                and create_department=#{createDepartment}
+            </if>
+        </where>
+        limit #{index},#{pagesize}
+    </select>
+
+
+
+    <select id="MissionCount" resultType="int">
+        select count(*) from mission
+        <where>
+            <if test='executorName!=null and executorName !=""'>
+                executor like concat('%',#{executorName},'%')
+            </if>
+
+            <if test="status !=null and status !=''">
+                and status=#{status}
+            </if>
+
+            <if test="createDepartment!=null and createDepartment !=''">
+                and create_department=#{createDepartment}
+            </if>
+        </where>
+    </select>
+
+
+    <update id="update">
+        update mission
+        <trim prefix="set" suffixOverrides=",">
+            <if test="status!=null and status!=''">
+                status=#{status},
+                update_time=now(),
+
+            </if>
+            <if test="executor!=null and executor!=''">
+                executor=#{executor},
+                update_time=now(),
+            </if>
+
+            <if test="executeTime!=null">
+                execute_time=#{executeTime},
+                update_time=now(),
+            </if>
+
+            <if test="finishTime!=null">
+                finish_time=#{finishTime},
+                update_time=now(),
+            </if>
+        </trim>
+            where id=#{id}
+    </update>
+
+    <delete id="multidelete">
+        delete from mission where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="insert">
+        insert into mission(mission_no,project_id,mission_name,create_department,executor,
+                            execute_time,finish_time,status,device_id,create_time,update_time)
+        values
+        (#{missionNo},#{projectId},#{missionName},#{createDepartment},#{executor},#{executeTime},#{finishTime},#{status},#{deviceId},now(),now())
+
+    </insert>
+
+
+    <select id="selectdepartment" resultType="String">
+        select distinct create_department from mission
+    </select>
+
+
+    <select id="selectexecutor" resultType="String">
+        select distinct executor from mission
+    </select>
+
+    <select id="dashmisscount" resultType="int">
+        select count(*) from mission
+    </select>
+
+    <select id="promission" resultType="com.mybatis.pojo.Mission">
+
+        select * from mission where project_id=#{projectId}
+
+
+    </select>
+
+
+</mapper>
+
+        <!--xml映射文件中的dtd约束-->

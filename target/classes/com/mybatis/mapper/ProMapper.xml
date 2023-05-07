@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.ProMapper">
+
+
+<select id="proSelect" resultType="com.mybatis.pojo.Project">
+
+    select * from project
+    <where>
+        <if test='manager!=null and manager !=""'>
+            manager like concat('%',#{manager},'%')
+        </if>
+
+        <if test="status !=null and status !=''">
+            and status=#{status}
+        </if>
+
+        <if test='province!=null and province !=""'>
+            and province=#{province}
+        </if>
+
+        <if test='city!=null and city !=""'>
+           and city=#{city}
+        </if>
+
+    </where>
+    limit #{index},#{pagesize}
+</select>
+<select id="proCount" resultType="Integer">
+
+    select count(*) from project
+    <where>
+        <if test='manager!=null and manager !=""'>
+            manager like concat('%',#{manager},'%')
+        </if>
+
+        <if test="status !=null and status !=''">
+            and status=#{status}
+        </if>
+
+        <if test='province!=null and province !=""'>
+            and province=#{province}
+        </if>
+
+        <if test='city!=null and city !=""'>
+            and city=#{city}
+        </if>
+
+    </where>
+
+</select>
+
+
+<insert id="proInsert">
+        insert into project(project_no,project_name,start_time,finish_time,manager,province,
+                            city,lng,lat,create_time,update_time,status)
+        values
+        (#{projectNo},#{projectName},#{startTime},#{finishTime},#{manager},#{province},#{city},#{lng},#{lat},now(),now(),#{status})
+    </insert>
+
+    <update id="proUpdate">
+        update project
+        <trim prefix="set" suffixOverrides=",">
+
+            <if test="projectNo!=null and projectNo!=''">
+                project_no=#{projectNo},
+                update_time=now(),
+            </if>
+
+            <if test="projectName!=null and projectName!=''">
+                project_name=#{projectName},
+                update_time=now(),
+            </if>
+
+            <if test="status!=null and status!=''">
+                status=#{status},
+                update_time=now(),
+            </if>
+            <if test="manager!=null and manager!=''">
+                manager=#{manager},
+                update_time=now(),
+            </if>
+
+            <if test="startTime!=null">
+                start_time=#{startTime},
+                update_time=now(),
+            </if>
+
+            <if test="finishTime!=null">
+                finish_time=#{finishTime},
+                update_time=now(),
+            </if>
+        </trim>
+        where id=#{id}
+
+    </update>
+
+    <delete id="proDelete">
+        delete from project where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectprovince" resultType="String">
+
+    select distinct province from project
+
+    </select>
+
+
+    <select id="selectcity" resultType="String">
+
+        select distinct city from project
+        where province=#{province}
+
+    </select>
+
+    <select id="selectmanager" resultType="String">
+        select distinct manager from project
+    </select>
+
+    <select id="dashprocount" resultType="int">
+        select count(*) from project
+    </select>
+
+    <select id="coorselect" resultType="com.mybatis.pojo.coordination">
+
+        select lng,lat,project_name from project
+
+    </select>
+
+    <select id="province" resultType="com.mybatis.pojo.Children">
+        select  distinct province from project
+-- 多字段去重
+    </select>
+
+    <select id="city" resultType="com.mybatis.pojo.Children">
+        select  distinct city from project where province=#{province}
+-- 多字段去重
+    </select>
+
+    <select id="project" resultType="com.mybatis.pojo.Project">
+        select * from project where city=#{city}
+    </select>
+
+
+    <select id="prolist" resultType="String">
+        select project_name from project
+
+    </select>
+
+    <select id="selectall" resultType="com.mybatis.pojo.Project">
+        select * from project
+
+    </select>
+
+
+
+</mapper>
